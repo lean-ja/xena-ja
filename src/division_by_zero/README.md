@@ -4,31 +4,52 @@
 
 ---
 
-## Hey! I heard that Lean thinks 1/0 = 0. Is that true?
+<!-- ## Hey! I heard that Lean thinks 1/0 = 0. Is that true? -->
+## ねえ, Lean では 1/0＝0 だって聞いたんだけど, 本当？
 
-Yes. So do Coq and Agda and many other theorem provers.
+<!-- Yes. So do Coq and Agda and many other theorem provers. -->
 
-## Doesn’t that lead to contradictions?
+本当ですよ．Coq や Agda，その他多くの証明支援系と同じです．
 
-No. It just means that Lean’s $/$ symbol doesn’t mean mathematical division. Let $\mathbb{R}$ denote the real numbers. Let’s define a function $f:\mathbb{R}^2\to\mathbb{R}$ by $f(x,y)=x/y$ if $y\not=0$ and $f(x,0)=0$. Does making that definition give us a contradiction in mathematics? No, of course not! It’s just a definition. Lean uses the symbol $/$ to mean $f$. As does Coq, Agda etc. Lean calls it `real.div` by the way, not $f$.
+<!-- ## Doesn’t that lead to contradictions? -->
+## それは矛盾にならないの？
 
-## But doesn’t that lead to confusion?
+<!-- No. It just means that Lean’s $/$ symbol doesn’t mean mathematical division. Let $\mathbb{R}$ denote the real numbers. Let’s define a function $f:\mathbb{R}^2\to\mathbb{R}$ by $f(x,y)=x/y$ if $y\not=0$ and $f(x,0)=0$. Does making that definition give us a contradiction in mathematics? No, of course not! It’s just a definition. Lean uses the symbol $/$ to mean $f$. As does Coq, Agda etc. Lean calls it `real.div` by the way, not $f$. -->
 
-It certainly seems to lead to confusion on Twitter. But it doesn’t lead to confusion when doing mathematics in a theorem prover. **Mathematicians don’t divide by 0** and hence in practice they never notice the difference between `real.div` and mathematical division (for which `1/0` is undefined). Indeed, if a mathematician is asking what Lean thinks `1/0` is, one might ask the mathematician why they are even asking, because as we all know, dividing by `0` is not allowed in mathematics, and hence this cannot be relevant to their work. In fact knowing `real.div` is the same as knowing mathematical division; any theorem about one translates into a theorem about the other, so having `real.div` is equivalent to having mathematical division.
+いいえ．Lean の $/$ 記号が数学的な割り算を意味しないというだけです．$\mathbb{R}$ を実数全体とします．関数 $f:\mathbb{R}^2\to\mathbb{R}$ を  $y\not=0$ に対しては $f(x,y)=x/y$ であり，$y=0$ のとき $f(x,0)=0$ を満たすようなものとして定義します．この定義が数学に矛盾をもたらすでしょうか？もちろんそんなことはありません！単なる定義です．Lean は $/$ 記号を $f$ の意味で使います．Coq や Agda と同じようにです．この関数は Lean では実際には $f$ ではなく，`real.div` と呼ばれます．
 
-## This convention is stupid though!
+<!-- ## But doesn’t that lead to confusion? -->
+## でも，混乱しない？
 
-It gets worse. There’s a subtraction `nat.sub` defined on the natural numbers $\lbrace 0,1,2,\ldots \rbrace$, with notation `x - y`, and it eats two natural numbers and spits out another natural number. If `x` and `y` are terms of type `ℕ` and `x < y`, then `x - y` will be `0`. There’s a function called `real.sqrt` which takes as input a real number, and outputs a real number. If you give it $2$, it outputs $\sqrt{2}$. I don’t know what happens if you give it the input $-1$, beyond the fact that it is guaranteed to output a real number. Maybe it’s $0$. Maybe it’s $1$. Maybe it’s $37$. I don’t care. I am a mathematician, and if I want to take the square root of a negative real number, I won’t use `real.sqrt` because I don’t want an answer in the reals, and the type of `real.sqrt` is `ℝ → ℝ`.
+<!-- It certainly seems to lead to confusion on Twitter. But it doesn’t lead to confusion when doing mathematics in a theorem prover. **Mathematicians don’t divide by 0** and hence in practice they never notice the difference between `real.div` and mathematical division (for which `1/0` is undefined). Indeed, if a mathematician is asking what Lean thinks `1/0` is, one might ask the mathematician why they are even asking, because as we all know, dividing by `0` is not allowed in mathematics, and hence this cannot be relevant to their work. In fact knowing `real.div` is the same as knowing mathematical division; any theorem about one translates into a theorem about the other, so having `real.div` is equivalent to having mathematical division. -->
 
-## Why can’t you just do it the sensible way like mathematicians do?
+確かに Twitter では混乱を招いているようですね．しかし，証明支援系で数学を行うときに混乱することはありません．**数学者は0で割り算をしません**から，`real.div` と数学的割り算（`1/0` は定義されない）の違いに気づくことはないのです．実際，Lean における `1/0` の定義を気にしている数学者がいたとしたら，その理由を尋ねられるでしょう．知っての通り，数学では `0` での割り算は許されていませんから，数学をする上では関係ないはずだからです．実のところ，`real.div` と数学的な割り算は同じと考えてよいものです．すべての `real.div` に関する定理は数学的な割り算に翻訳できますし，逆も然りです．`real.div` を実装することは，数学的な割り算を実装することと等価です．
 
-Great question! I tried this in 2017! Turns out it’s really inconvenient in a theorem prover!
+<!-- ## This convention is stupid though! -->
+## こんな慣例ばかげてる！
 
-Here’s how I learnt Lean. I came at it as a “normal mathematician”, who was thinking about integrating Lean into their undergraduate introduction to proof course. I had no prior experience with theorem provers, and no formal background in programming. As a feasibility study, I tried to use Lean to do all the problem sheets which I was planning on giving the undergraduates. This was back in 2017 when Lean’s maths library was much smaller, and `real.sqrt` did not yet exist. However the basic theory of sups and infs had been formalised, so I defined `real.sqrt x`, for `x` non-negative, to be $Sup\lbrace y\in\mathbb{R} ∣ y^2\leq x\rbrace$, and proved the basic theorems that one would want in an interface for a square root function, such as $\sqrt{ab}=\sqrt{a}\sqrt{b}$ and $\sqrt{a^2}=a$ and $\sqrt{a^2b}=a\sqrt{b}$ and so on (here $a,b$ are non-negative reals, the only reals which my function would accept).
+<!-- It gets worse. There’s a subtraction `nat.sub` defined on the natural numbers $\lbrace 0,1,2,\ldots \rbrace$, with notation `x - y`, and it eats two natural numbers and spits out another natural number. If `x` and `y` are terms of type `ℕ` and `x < y`, then `x - y` will be `0`. There’s a function called `real.sqrt` which takes as input a real number, and outputs a real number. If you give it $2$, it outputs $\sqrt{2}$. I don’t know what happens if you give it the input $-1$, beyond the fact that it is guaranteed to output a real number. Maybe it’s $0$. Maybe it’s $1$. Maybe it’s $37$. I don’t care. I am a mathematician, and if I want to take the square root of a negative real number, I won’t use `real.sqrt` because I don’t want an answer in the reals, and the type of `real.sqrt` is `ℝ → ℝ`. -->
 
-I then set out to prove $\sqrt{2}+\sqrt{3}<\sqrt{10}$, a question on a problem sheet from my course. The students are told not to use a calculator, and asked to find a proof which only uses algebraic manipulations, i.e. the interface for `real.sqrt`. Of course, the way I had set things up, **every time** I used the $\sqrt{\phantom{2}}$ symbol I had to supply a proof that what I was taking the square root of was non-negative. Every time the symbol occurred in my proof. Even if I had proved `2 > 0` on the previous line, I had to prove it again on this line, because this line also had a $\sqrt{2}$ in. Of course the proof is just by `norm_num`, but that was 10 characters which I soon got sick of typing.
+ゼロ除算以外にも例があります．自然数 $\lbrace 0,1,2,\ldots \rbrace$ には引き算 `nat.sub` が定義されていて，`x - y` と書きます．これは2つの自然数を与えられたら1つの自然数を返します．仮に `x < y` だったとしたら，`x - y` は `0` です．`real.sqrt` という関数もあり，これは実数を1つ与えられたら実数を1つ返します．$2$ を入力したら出力は $\sqrt{2}$ です．`-1` を入力したら，何が返されるかはよくわかりませんが実数が返ってくることは保証されています．$0$ かもしれませんし，$1$ かもしれません．$37$ かも? どうだっていいことです．私は数学者であり，負の実数の平方根を取りたい場合 `real.sqrt` は使いません．なぜなら実数で答えを出したくないからです．一方で `real.sqrt` の型は `ℝ → ℝ` です．
 
-I then moaned about this on the Lean chat, was mocked for my silly mathematician conventions, and shown the idiomatic Lean way to do it. The idiomatic way to do it is to allow garbage inputs like negative numbers into your square root function, and return garbage outputs. It is in the **theorems** where one puts the non-negativity hypotheses. For example, the statement of the theorem that $\sqrt{ab}=\sqrt{a}\sqrt{b}$ has the hypotheses that $a,b\geq 0$. Note that it does not also have the hypothesis that $ab\geq 0$, as one can deduce this within the proof and not bother the user with it. This is in contrast to the mathematicians’ approach, where the proof that $ab\geq 0$ would also need to be supplied because it is in some sense part of the $\sqrt{\phantom{2}}$ notation.
+<!-- ## Why can’t you just do it the sensible way like mathematicians do? -->
+## 数学者がやるような常識的な方法では何がまずいの？
+
+<!-- Great question! I tried this in 2017! Turns out it’s really inconvenient in a theorem prover! -->
+
+素晴らしい質問ですね．2017 年に私は試してみました．証明支援系ではとても不便な方法だということがわかりました！
+
+<!-- Here’s how I learnt Lean. I came at it as a “normal mathematician”, who was thinking about integrating Lean into their undergraduate introduction to proof course. I had no prior experience with theorem provers, and no formal background in programming. As a feasibility study, I tried to use Lean to do all the problem sheets which I was planning on giving the undergraduates. This was back in 2017 when Lean’s maths library was much smaller, and `real.sqrt` did not yet exist. However the basic theory of sups and infs had been formalised, so I defined `real.sqrt x`, for `x` non-negative, to be $Sup\lbrace y\in\mathbb{R} ∣ y^2\leq x\rbrace$, and proved the basic theorems that one would want in an interface for a square root function, such as $\sqrt{ab}=\sqrt{a}\sqrt{b}$ and $\sqrt{a^2}=a$ and $\sqrt{a^2b}=a\sqrt{b}$ and so on (here $a,b$ are non-negative reals, the only reals which my function would accept). -->
+
+私が Lean を学んでいたときのことです．私は「普通の数学者」として，学部の証明入門コースに Lean を取り入れようと考えていました．私は当時定理証明の経験がなく, プログラミングの正式な素養もありませんでした．Lean での授業が実現可能か調査するために，学部生に配る予定だった問題集をすべて Lean でやってみました．これは Lean の数学ライブラリがもっと小さくて，`real.sqrt` がまだ存在していなかった 2017 年当時の話です．しかし sup と inf の基本理論は形式化されていたので，私は 0 以上の `x` に対して `real.sqrt x` を $\mathrm{Sup}\lbrace y\in\mathbb{R} ∣ y^2\leq x\rbrace$ として定義しました．そして，平方根関数を扱うのに必要な $\sqrt{ab}=\sqrt{a}\sqrt{b}$ や $\sqrt{a^2}=a$ や $\sqrt{a^2b}=a\sqrt{b}$ などの基本的な定理を証明しました．(ここで $a, b$ は非負実数です．私の定義した平方根関数は非負実数しか受け付けません．)
+
+<!-- I then set out to prove $\sqrt{2}+\sqrt{3}<\sqrt{10}$, a question on a problem sheet from my course. The students are told not to use a calculator, and asked to find a proof which only uses algebraic manipulations, i.e. the interface for `real.sqrt`. Of course, the way I had set things up, **every time** I used the $\sqrt{\phantom{2}}$ symbol I had to supply a proof that what I was taking the square root of was non-negative. Every time the symbol occurred in my proof. Even if I had proved `2 > 0` on the previous line, I had to prove it again on this line, because this line also had a $\sqrt{2}$ in. Of course the proof is just by `norm_num`, but that was 10 characters which I soon got sick of typing. -->
+
+そして私の授業の問題集にあった $\sqrt{2}+\sqrt{3}<\sqrt{10}$ に取り掛かりました．電卓を使わずに，代数的な操作だけを使って証明せよという問題です．つまり，`real.sqrt` を使う問題です．言うまでもなく，私が使った定義では，$\sqrt{\phantom{2}}$ を使うたびに**毎回**平方根の中が非負であることを証明する必要があります．毎度毎度平方根が現れるたびにです．たとえ前の行で `2 > 0` を証明していても，次の行で $\sqrt{2}$ があればまた示す必要があるのです．もちろん証明は `norm_num` で済むのですが，私はすぐにこれをタイプするのが嫌になりました．
+
+<!-- I then moaned about this on the Lean chat, was mocked for my silly mathematician conventions, and shown the idiomatic Lean way to do it. The idiomatic way to do it is to allow garbage inputs like negative numbers into your square root function, and return garbage outputs. It is in the **theorems** where one puts the non-negativity hypotheses. For example, the statement of the theorem that $\sqrt{ab}=\sqrt{a}\sqrt{b}$ has the hypotheses that $a,b\geq 0$. Note that it does not also have the hypothesis that $ab\geq 0$, as one can deduce this within the proof and not bother the user with it. This is in contrast to the mathematicians’ approach, where the proof that $ab\geq 0$ would also need to be supplied because it is in some sense part of the $\sqrt{\phantom{2}}$ notation. -->
+
+Lean チャットでこのことを愚痴ったところ，数学者の慣習の愚かさを指摘され，Lean 流の慣用的なやり方を教えられました．それは，負の数のようなゴミ入力を平方根関数に許可し，ゴミ出力を返すことです．非負の仮定は**定理**の中に置きます．例えば，$\sqrt{ab}=\sqrt{a}\sqrt{b}$ という定理には, $a,b\geq 0$ であるという仮定を持たせます．$ab\geq 0$ という仮定は持たせないことに注意してください．というのも，証明の中で導くことができるので，この定理のユーザにそれを示させる必要がないからです．これは関数に仮定を持たせる数学者流のアプローチとは対照的です．数学者流では，$\sqrt{\phantom{2}}$ という表記自体が非負性を要求するので，$ab\geq 0$ も示す必要がありました．
 
 ## So you’re saying this crazy way is actually better?
 
