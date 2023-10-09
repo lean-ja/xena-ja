@@ -3,10 +3,14 @@ authors = ["Seasawher"]
 language = "ja"
 multilingual = false
 src = "src"
-title = "Mathematics in type theory 日本語訳"
+title = "Xena 日本語訳"
+
+[build]
+create-missing = false
+build-dir = "book"
 
 [output.html]
-git-repository-url = "https://github.com/lean-ja/math-in-type-theory-ja"
+git-repository-url = "https://github.com/lean-ja/xena-ja"
 
 # 日本語検索に対応していないため，無効にする
 [output.html.search]
